@@ -11,14 +11,14 @@
 % end
 
 % Function 2: Plot the Queue evolution
-function plot_algorithm_queue_evolution(T, queue_evolution_algo, queue_evolution_optimal, m, optimal_arm)
+function plot_algorithm_queue_evolution(T, queue_evolution_algo, queue_evolution_optimal, queue_evolution_qths, m, optimal_arm)
     figure;
     hold on;
     
     % plot Queue Evolution for the Algorithm and the Optimal Arm
     h_algo = plot(1:T, queue_evolution_algo, 'DisplayName', 'Our Algorithm', 'LineWidth', 1.5);
     h_optimal = plot(1:T, queue_evolution_optimal, 'DisplayName', ['Static Optimal Channel' num2str(optimal_arm)], 'LineWidth', 1.5);
-    h_qths = plot(1:T, queue_)
+    h_qths = plot(1:T, queue_evolution_qths,'DisplayName', 'Q-ThS','LineWidth',1.5);
     % 
     colors = [0.95, 0.95, 0.95; % White
         0.9, 0.9, 0.9];   % Grey
@@ -60,7 +60,7 @@ function plot_algorithm_queue_evolution(T, queue_evolution_algo, queue_evolution
     
     xlabel('Time Step');
     ylabel('Queue Length');
-    legend([h_algo, h_optimal], 'Location', 'best');  % Only include the algorithm and optimal queue plot handles in the legend
+    legend([h_algo, h_optimal, h_qths], 'Location', 'best');  % Only include the algorithm and optimal queue plot handles in the legend
     title('Queue Evolution - Static Optimal vs. Our Algorithm Comparison');
     
     hold off;

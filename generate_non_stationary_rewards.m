@@ -1,5 +1,5 @@
 % Function to generate non-stationary rewards for N arms over T rounds
-function [rewards,sample_mean_per_arm] = generate_non_stationary_rewards(N, T, m, dist_type, a, b)
+function [rewards,sample_mean_per_arm, sample_means] = generate_non_stationary_rewards(N, T, m, dist_type,mu_per_block)
     % N: Number of arms
     % T: Total number of rounds
     % m: Number of blocks (divisions)
@@ -13,11 +13,11 @@ function [rewards,sample_mean_per_arm] = generate_non_stationary_rewards(N, T, m
     
     %generate a random rate (lambda) for each arm and each block (if needed)
     
-    lambda = a + (b - a) * rand(N, m);  % Random rates for each arm and each block
-    disp('Lambda per block')
-    display(lambda);
-    disp('Mean lambda per arm')
-    display(mean(lambda,2))
+    lambda = rand(N, m);  % Random rates for each arm and each block
+    % disp('Lambda per block')
+    % display(lambda);
+    % disp('Mean lambda per arm')
+    % display(mean(lambda,2))
 
     %sample mean variable
     sample_means = zeros(N,m);
@@ -47,7 +47,7 @@ function [rewards,sample_mean_per_arm] = generate_non_stationary_rewards(N, T, m
                 case 'uniform'
                     % generate uniformly distributed rewards in the range [0, 1]
                     % block_rewards = 2*lambda(arm,block) * rand(1, end_idx - start_idx + 1);
-                    block_rewards = unifrnd(0,2*lambda(arm,block),[1,end_idx - start_idx + 1]);
+                    block_rewards = unifrnd(0,2*mu_per_block(arm,block),[1,end_idx - start_idx + 1]);
                 
                 case 'exprnd'
                     %generate Exponential-distributed rewards with rate lambda

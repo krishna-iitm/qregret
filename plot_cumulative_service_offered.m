@@ -1,9 +1,9 @@
 % Function 3: Plot Cumulative Service Offered 
 
 
-function plot_cumulative_service_offered(N, T, rewards, total_service_algo)
+function plot_cumulative_service_offered(N, T, rewards, total_service_algo, total_service_qths)
     figure;
-    cumulative_service = zeros(N+1, 1);
+    cumulative_service = zeros(N+2, 1);
     
    
     for arm = 1:N
@@ -11,6 +11,7 @@ function plot_cumulative_service_offered(N, T, rewards, total_service_algo)
     end
     
     cumulative_service(N+1) = total_service_algo/T;
+    cumulative_service(N+2) = total_service_qths/T;
     
     % create a bar plot 
     h = bar(cumulative_service);
@@ -25,7 +26,7 @@ function plot_cumulative_service_offered(N, T, rewards, total_service_algo)
     title('Mean Service Offered');
     
     % xticks and xticklabels
-    xticks(1:N+1);  % Set positions of the ticks for each arm + 1 for 'Algorithm'
-    xticklabels([arrayfun(@(i) ['Channel ' num2str(i)], 1:N, 'UniformOutput', false), {'Algorithm'}]); 
+    xticks(1:N+2);  % Set positions of the ticks for each arm + 1 for 'Algorithm'
+    xticklabels([arrayfun(@(i) ['Channel ' num2str(i)], 1:N, 'UniformOutput', false), {'Our Algo'}, 'Q-ThS']); 
     
 end

@@ -1,0 +1,26 @@
+# Ignore MATLAB temporary and backup files
+*.asv
+*.aut
+*.bak
+*.swp
+*.log
+
+# Ignore MATLAB-specific data files
+*.mat
+*.fig
+*.slx
+*.mdl
+*.mex*
+*.pdf
+# Ignore IDE or editor folders (if applicable)
+.vscode/
+.idea/
+
+# Ignore system-specific files (optional)
+Thumbs.db
+.DS_Store
+
+# Directories to ignore
+backup/
+old/
+results/
