@@ -45,7 +45,7 @@ change of statistics.
 
 
 
-## Files
+## Main Files
 
 - **multiple_runs_main.m**: Main script for repeated Monte Carlo simulations.
 - **non_stat_channel_mult.m**: Generates non-stationary rewards.
