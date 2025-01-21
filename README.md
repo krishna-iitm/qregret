@@ -1,5 +1,4 @@
 # qregret
-qregret
 
 This repository contains MATLAB code for running Monte Carlo simulations to analyze Qregret in non-stationary environments. 
 It simulates three algorithms Q-Regret [Sinha and Krishnakumar, 2025], Q-ThS [S Krishnasamy eta al., 2016] and [Stahlbuhk,2021]. 
