@@ -34,6 +34,19 @@ Each simulation run produces:
 
 simulation_data_#.mat: Stores all variables for that run.
 Plots saved as PDFs in the corresponding folder.
+The structure of the 'results' directory is given below
+results/
+│
+├── 01/
+│   ├── 01-matlab-data/
+│   ├── 01.pdf
+│   └── ...
+├── 02/
+│   ├── 02-matlab-data/
+│   ├── 01.pdf
+│   └── ...
+└── ...
+
 
 Custom Breakpoints:
 To use custom breakpoints for non-stationary rewards: Incase you want to divide the T at custom points to change its statistics,
