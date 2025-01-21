@@ -1,17 +1,65 @@
 % Main script for Monte Carlo simulations
 clear;
-% Delete all previous .mat files from previous runs
-old_mat_files = dir('simulation_data_*.mat');  % List all .mat files with this pattern
+
+% Define the 'results' directory path
+resultsDir = fullfile(pwd, 'results');
+
+% Check if the 'results' directory exists, if not, create it
+if ~exist(resultsDir, 'dir')
+    mkdir(resultsDir);
+end
+
+% Get the list of all existing subdirectories in the 'results' directory
+subdirs = dir(resultsDir);
+subdirs = subdirs([subdirs.isdir] & ~ismember({subdirs.name}, {'.', '..'}));  % Keep only directories
+
+% Determine the next available folder number (e.g., '01', '02', '03', ...)
+if isempty(subdirs)
+    nextFolderNumber = 1;  % Start with '01' if no folders exist
+else
+    existingFolderNumbers = [];
+    for i = 1:length(subdirs)
+        folderName = subdirs(i).name;
+        if ~isempty(folderName) && all(isstrprop(folderName, 'digit'))
+            existingFolderNumbers = [existingFolderNumbers, str2double(folderName)];
+        end
+    end
+    if isempty(existingFolderNumbers)
+        nextFolderNumber = 1;
+    else
+        nextFolderNumber = max(existingFolderNumbers) + 1;  % Increment the maximum folder number
+    end
+end
+
+% Create the new folder with the next available number (e.g., '01', '02', '03', ...)
+newFolderName = sprintf('%02d', nextFolderNumber);
+newFolderPath = fullfile(resultsDir, newFolderName);
+mkdir(newFolderPath);  % Create the new folder
+
+% Create a subfolder for MATLAB data inside the simulation folder (e.g., '01-matlab-data')
+matlabDataFolder = fullfile(newFolderPath, [newFolderName, '-matlab-data']);
+mkdir(matlabDataFolder);  % Create the subfolder for MATLAB data
+
+% Delete all previous .mat files from previous runs in the MATLAB data folder
+old_mat_files = dir(fullfile(matlabDataFolder, 'simulation_data_*.mat'));  % List all .mat files in the subfolder
 
 for k = 1:length(old_mat_files)
-    delete(old_mat_files(k).name);  % Delete each file
+    delete(fullfile(matlabDataFolder, old_mat_files(k).name));  % Delete each file
     disp(['Deleted previous simulation data: ', old_mat_files(k).name]);
 end
+clear i;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Main Parameters
 N = 5;         % Number of arms (channels)
 T = 10^4;       % Number of time steps
+
+% Stationarity control
 m = 2;             % Number of blocks for non-stationary rewards
+
+isCustomBreakPointsNeeded = true;
+breakpoints = [1 1000 10000];
+
+
 % Calculate gamma
 gamma = min(1, sqrt(N) * T^(-0.25));
 
@@ -23,14 +71,12 @@ eta = sqrt(2)/ (G * sqrt(T));
 % Initialize the probability distribution over arms 
 p_init = ones(1, N) / N;
 
-% Parameters for 
+% Parameters for non-stationary rewards
 a = 0;         % Min range for lambda per block
 b = 1;         % Max range for lambda per block
 dist_type = 'uniform'; % Distribution type for rewards (as of now go with uniform)
 
-% mu_per_block=[0.7 0.6 0.5; 0.3 0.3 0.3; 0.1 0.9 0.2; 0.2 0.95 0.8; 0.7 0.2 0.4];
 num_of_sim = 500; % Number of MonteCarlo simulations to run and take average.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -47,17 +93,17 @@ for sim_num = 1:num_of_sim
     end
 
     % Generate non-stationary rewards
-    % [rewards,sample_mean_per_arm, per_block_sample_mean] = generate_non_stationary_rewards(N, T, m, dist_type,mu_per_block);
-    [rewards, sample_mean_per_arm, per_block_sample_mean] = non_stat_channel_mult(N, T,m);
-    breakpoints = [1, 1000, 10000];
-    [rewards, sample_mean_per_arm, per_block_sample_mean] = non_stat_channel_mult_custombreakpoint(N,T,breakpoints);
-    % Simulate the arrival process 
+    if isCustomBreakPointsNeeded
+        m = length(breakpoints) - 1;
+        [rewards, sample_mean_per_arm, per_block_sample_mean] = non_stat_channel_mult_custombreakpoint(N, T,breakpoints);
+    else
+        [rewards, sample_mean_per_arm, per_block_sample_mean] = non_stat_channel_mult(N, T,m);
+    end
+    
     max_serv_rate = max(mean(sample_mean_per_arm, 2));
 
-    % simulate the arrival process (random for now)
-    A = 0+(2*(max_serv_rate-0.25))*rand(1, T);  % Arrival
-    % A=2*(0.50)*rand(1,T);
-    % A = rand(1, T);  % Arrival
+    % Simulate the arrival process 
+    A = 0+(2*(max_serv_rate-0.15))*rand(1, T);  % Arrival
     disp('Mean Arrival:');
     display(mean(A));
 
@@ -69,49 +115,20 @@ for sim_num = 1:num_of_sim
     [queue_evolution_qths, queue_evolution_qths_opt, theta_qths, arm_choices_qths, channel_gains_qths, optimal_arm_qths] = q_ths_algorithm(N, T, rewards, A, p_init, sample_mean_per_arm);
     [queue_evolution_stahlbuhk, arm_choices_stahlbuhk, channel_gains_stalbuhk] = stahlbuhk_algo_01(N,T,rewards,A);
 
-    
-    % % Initialize variables for optimal arm selection
-    % optimal_arm = 0;
-    % max_regret = -inf;
-
-    % %Loop over all arms and calculate the regret for the entire time period
-    % for arm = 1:N
-    %     regret = max(queue_evolution_algo - all_arms_queue_evolutions(arm, :));
-    %     if regret > max_regret
-    %         max_regret = regret;
-    %         optimal_arm = arm; 
-    %     end
-    % end
-
-    % q_regret is the max over all time, difference between the algorithm's queue and the optimal arm's queue
-    % q_diff_regret = queue_evolution_algo - all_arms_queue_evolutions(optimal_arm, :);
-    % q_regret = (q_diff_regret);
-
     [~, j_star] = max(sample_mean_per_arm);
     q_regret = queue_evolution_algo - all_arms_queue_evolutions(j_star,:);
-   
-    %q_regret Q-ThS
     q_diff_qths = queue_evolution_qths - all_arms_queue_evolutions(j_star,:);
     q_regret_qths = q_diff_qths;
-    
-    % Stahlbuhk
-    q_regret_stahlbuhk = (queue_evolution_stahlbuhk) - (all_arms_queue_evolutions(j_star,:));
-    q_regret_stahlbuhk = q_regret_stahlbuhk;
+    q_regret_stahlbuhk = queue_evolution_stahlbuhk - all_arms_queue_evolutions(j_star,:);
 
     % Define the filename based on the current simulation number
     filename = ['simulation_data_' num2str(sim_num) '.mat'];
-
-    % Check if the file exists
-    if exist(filename, 'file') == 2  % 'file' means checking for a file
-        delete(filename);  % Delete the file if it already exists...
-        disp(['Deleted previous simulation data: ', filename]);
-    else
-        %do nothing
-    end
-
-    % Save all variables for this simulation
-    save([filename]);  % Save all variables
     
+    % Save the variables to the MATLAB data folder inside the new folder
+    save(fullfile(matlabDataFolder, filename));  % Save all variables in the subfolder
 end
 
-% Now RUN read_n_plot_avg_qregret.m to load and plot the avg q-regret
+% Call the plotting and saving function after simulations
+close all;
+read_n_plot_avg_qregret;
+save2pdf(newFolderPath);

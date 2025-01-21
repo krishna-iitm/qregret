@@ -1,3 +1,5 @@
+% Subroutine for projection onto the probability simplex.
+% Used in OGD of our algorithm.
 function p_proj = proj_simplex(v)
     % v: Input vector to be projected onto the probability simplex
     

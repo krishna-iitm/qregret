@@ -1,6 +1,6 @@
-%simulating all queues to find the optimal channel i 
-%optimal i is the one that maximizes q-regret?
-%\
+% simulating all queues to find the optimal channel i 
+% optimal i is the one that maximizes q-regret
+% Inefficient
 function [all_arms_queue_evolutions, cumulative_service] = simulate_queues_and_cumulative_service(N, T, rewards, A)
     %initialize matrices to store the queue evolution, cumulative service, and queue lengths
     all_arms_queue_evolutions = zeros(N, T);  % Queue evolution for each arm over time

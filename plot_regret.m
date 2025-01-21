@@ -17,9 +17,9 @@ function [h_regret, h_regret_qths, h_regret_stahlbuhk] = plot_regret(T, q_regret
     hold on;
 
     % Plot Q-Regret, store the plot handle for legend
-    h_regret = plot(1:T, q_regret, 'DisplayName', 'This work', 'LineWidth', 1.5);
-    h_regret_qths = plot(1:T, q_regret_qths, 'DisplayName', 'Q-ThS (S. Krishnasamy et al. [8])', 'LineWidth', 1.5);
-    h_regret_stahlbuhk = plot(1:T, q_regret_stahlbuhk, 'DisplayName', 'Stahlbuhk et al. [7]', 'LineWidth', 1.5);
+    h_regret = plot(1:T, q_regret, 'DisplayName', 'This work', 'LineWidth', 2);
+    h_regret_qths = plot(1:T, q_regret_qths, 'DisplayName', 'Q-ThS (S. Krishnasamy et al. [8])', 'LineWidth', 2);
+    h_regret_stahlbuhk = plot(1:T, q_regret_stahlbuhk, 'DisplayName', 'Stahlbuhk et al. [7]', 'LineWidth', 2);
 
     % Colors for blocks
     colors = [0.98, 0.98, 0.98; 0.88, 0.88, 0.88];
@@ -81,6 +81,9 @@ function [h_regret, h_regret_qths, h_regret_stahlbuhk] = plot_regret(T, q_regret
         h_patch = patch(x, y, block_color, 'EdgeColor', 'none', 'FaceAlpha', 0.3);
 
         set(h_patch, 'DisplayName', '');
+        
+        % Add a dashed vertical line at the end of each block
+        plot([block_end, block_end], [y_min_extended, y_max_extended], 'k--', 'LineWidth', 0.5);  % Dashed line
     end
 
     % Set axis labels with larger fonts
@@ -92,7 +95,7 @@ function [h_regret, h_regret_qths, h_regret_stahlbuhk] = plot_regret(T, q_regret
     
     % Adjust the legend font size
     if isWithLegend
-        legend([h_regret h_regret_qths, h_regret_stahlbuhk], 'Location', 'best', 'FontSize', fontsize(2), 'FontName', 'Arial');
+        legend([h_regret_stahlbuhk, h_regret_qths, h_regret], 'Location', 'best', 'FontSize', fontsize(2), 'FontName', 'Arial');
     end
 
     % Set grid and axes properties for clarity
@@ -101,7 +104,6 @@ function [h_regret, h_regret_qths, h_regret_stahlbuhk] = plot_regret(T, q_regret
     
     hold off;
 end
-
 
 
 % function [h_regret, h_regret_qths, h_regret_stahlbuhk] = plot_regret(T, q_regret, m, q_regret_qths, q_regret_stahlbuhk, titleString, fontsize,isWithLegend, isNewFigure)

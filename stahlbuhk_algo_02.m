@@ -1,3 +1,5 @@
+% Heuristic Algorithm given in Stahlbuhk paper: Fig 9
+
  function [Q, arm_choices, channel_gains] = stahlbuhk_algo_02(N, T, rewards, A)
     % Initialize global estimates
     global_mu_hat = zeros(1, N); % Global service rate estimates (initially 0)

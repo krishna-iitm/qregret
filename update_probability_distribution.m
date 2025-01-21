@@ -1,3 +1,4 @@
+% Subroutine for our-algorithm [Sinha and Krishnakumar]
 function p = update_probability_distribution(p, g, eta)
     % p: curr probability distribution (N-dim vector)
     % g: gain

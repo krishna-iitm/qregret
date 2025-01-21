@@ -1,3 +1,4 @@
+% Original algorithm given in their paper which achieves Theorem 4 (Fig7 and Fig8)
 function [Q, arm_choices, channel_gains] = stahlbuhk_algo_01(N, T, rewards, A)
     % Initialize global estimates
     global_mu_hat = zeros(1, N); % Global service rate estimates (initially 0)

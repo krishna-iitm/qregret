@@ -1,3 +1,4 @@
+% Main subroutine for implementing Q-ThS proposed in S Krishnasamy et al. 2016, NeurIPS
 function [queue_length_ths, queue_length_ths_opt, theta_hat, arm_choices_ths, channel_gains_ths, optimal_arm_ths, mu_hat] = q_ths_algorithm(N, T, rewards, A, p_init, sample_mean_per_arm)
     % Initialize the probability distribution
     p_ths = p_init;  % Initial uniform probability distribution
@@ -21,6 +22,9 @@ function [queue_length_ths, queue_length_ths_opt, theta_hat, arm_choices_ths, ch
     arm_counts = zeros(1, N);  % Counts for how many times each arm is chosen
     total_rewards = zeros(1, N); % Total reward accumulated by each arm
     mu_hat = zeros(1, N);  % Estimated mean reward for each arm
+
+    % Counts the no of observations 
+    num_of_selections=zeros(1,N);
 
     % Loop through time steps
     for t = 1:T
@@ -48,6 +52,9 @@ function [queue_length_ths, queue_length_ths_opt, theta_hat, arm_choices_ths, ch
         % Get the reward (service rate) for the selected arm
         selected_arm_reward = rewards(J_t, t);
         
+        % Update the number of selections for the selected arm
+        num_of_selections(J_t) = num_of_selections(J_t) + 1;
+
         % Update the queue for the selected arm
         current_queue_ths = max(0, current_queue_ths + A(t) - selected_arm_reward);
         current_queue_ths_opt = max(0, current_queue_ths_opt + A(t) - rewards(j_star_qths, t));
@@ -61,7 +68,9 @@ function [queue_length_ths, queue_length_ths_opt, theta_hat, arm_choices_ths, ch
         total_rewards(J_t) = total_rewards(J_t) + selected_arm_reward;
 
         % Update the mean estimate for each arm (mu_hat)
-        mu_hat = total_rewards / t;
+        %mu_hat = total_rewards / t;
+
+        mu_hat(J_t) = total_rewards(J_t) / num_of_selections(J_t);
 
         % Calculate the cumulative channel gains (service)
         channel_gains_ths(t) = selected_arm_reward;
