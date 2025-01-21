@@ -11,7 +11,7 @@
 *.slx
 *.mdl
 *.mex*
-*.pdf
+#*.pdf
 # Ignore IDE or editor folders (if applicable)
 .vscode/
 .idea/
